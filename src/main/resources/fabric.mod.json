@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "ferroustry",
   "version": "${version}",
 
   "name": "Example Mod",
@@ -18,11 +18,11 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "tfar.example.ExampleMod"
+      "tfar.ferroustry.Ferroustry"
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "ferroustry.mixins.json"
   ],
 
   "depends": {
