@@ -1,29 +1,28 @@
 package tfar.ferroustry.tree;
 
 import net.minecraft.block.sapling.LargeTreeSaplingGenerator;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.DefaultBiomeFeatures;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.TreeFeatureConfig;
+import net.minecraft.world.gen.feature.*;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Random;
 
 public class ResourceTree extends LargeTreeSaplingGenerator {
 
-  private final TreeFeatureConfig baseTreeFeatureConfig;
+  private final List<ConfiguredFeature<TreeFeatureConfig, ?>> configuredFeatureList1;
+  private final List<ConfiguredFeature<TreeFeatureConfig, ?>> configuredFeatureList2;
 
-  public ResourceTree(TreeFeatureConfig treeFeatureConfigFeature) {
-    this.baseTreeFeatureConfig = treeFeatureConfigFeature;
+  public ResourceTree(List<ConfiguredFeature<TreeFeatureConfig, ?>> configuredFeatureList1, List<ConfiguredFeature<TreeFeatureConfig, ?>> configuredFeatureList2) {
+    this.configuredFeatureList1 = configuredFeatureList1;
+    this.configuredFeatureList2 = configuredFeatureList2;
+  }
+
+  protected ConfiguredFeature<TreeFeatureConfig, ?> createTreeFeature(Random rand, boolean bl) {
+    return configuredFeatureList1.get(rand.nextInt(configuredFeatureList1.size()));
   }
 
   @Nullable
-  protected ConfiguredFeature<TreeFeatureConfig, ?> createTreeFeature(Random p_225546_1_, boolean p_225546_2_) {
-    return Feature.TREE.configure(baseTreeFeatureConfig);
-  }
-
-  @Nullable
-  protected ConfiguredFeature<TreeFeatureConfig, ?> createLargeTreeFeature(Random p_225547_1_) {
-    return Feature.TREE.configure(p_225547_1_.nextBoolean() ? DefaultBiomeFeatures.MEGA_SPRUCE_TREE_CONFIG : DefaultBiomeFeatures.MEGA_PINE_TREE_CONFIG);
+  protected ConfiguredFeature<TreeFeatureConfig, ?> createLargeTreeFeature(Random rand) {
+    return configuredFeatureList2.get(rand.nextInt(configuredFeatureList2.size()));
   }
 }

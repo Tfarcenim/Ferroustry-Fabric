@@ -7,7 +7,7 @@
   ],
   "key": {
     "#": {
-      "tag": "forge:ores/aluminum"
+      "tag": "c:aluminum_ores"
     },
     "s": {
       "tag": "minecraft:saplings"

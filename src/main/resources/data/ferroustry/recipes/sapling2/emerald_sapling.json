@@ -7,7 +7,7 @@
   ],
   "key": {
     "#": {
-      "tag": "forge:storage_blocks/emerald"
+      "tag": "c:emerald_blocks"
     },
     "s": {
       "tag": "minecraft:saplings"

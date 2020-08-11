@@ -7,7 +7,7 @@
   ],
   "key": {
     "#": {
-      "tag": "forge:storage_blocks/lapis"
+      "tag": "c:lapis_blocks"
     },
     "s": {
       "tag": "minecraft:saplings"

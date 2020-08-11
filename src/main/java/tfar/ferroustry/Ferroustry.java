@@ -7,12 +7,19 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.gen.UniformIntDistribution;
 import net.minecraft.world.gen.feature.size.TwoLayersFeatureSize;
 import net.minecraft.world.gen.foliage.BlobFoliagePlacer;
+import net.minecraft.world.gen.foliage.FoliagePlacer;
+import net.minecraft.world.gen.foliage.SpruceFoliagePlacer;
 import net.minecraft.world.gen.stateprovider.SimpleBlockStateProvider;
+import net.minecraft.world.gen.trunk.GiantTrunkPlacer;
 import net.minecraft.world.gen.trunk.StraightTrunkPlacer;
+import net.minecraft.world.gen.trunk.TrunkPlacer;
 import tfar.ferroustry.block.ResourceSaplingBlock;
 import tfar.ferroustry.block.ResourceStairsBlock;
 import tfar.ferroustry.tree.ResourceTree;
@@ -24,10 +31,7 @@ import net.minecraft.world.gen.feature.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 // The value here should match an entry in the META-INF/mods.toml file
 public class Ferroustry implements ModInitializer, ClientModInitializer {
@@ -54,18 +58,61 @@ public class Ferroustry implements ModInitializer, ClientModInitializer {
     Block.Settings leaves = Block.Settings.of(Material.LEAVES).strength(0.2F).ticksRandomly().sounds(BlockSoundGroup.GRASS).nonOpaque();
     Block.Settings sapling = Block.Settings.of(Material.LEAVES).noCollision().ticksRandomly().strength(0).sounds(BlockSoundGroup.GRASS);
     Block.Settings plank = Block.Settings.of(Material.WOOD, MaterialColor.CLAY).strength(2, 6).sounds(BlockSoundGroup.WOOD);
+
+    List<Pair<FoliagePlacer,TrunkPlacer>> configuredSmallFeatureList = new ArrayList<>();
+
+    List<Pair<FoliagePlacer,TrunkPlacer>> configuredBigFeatureList = new ArrayList<>();
+
+    for (ConfiguredFeature<?,?> configuredFeature : BuiltinRegistries.CONFIGURED_FEATURE) {
+      if (configuredFeature.config instanceof TreeFeatureConfig) {
+        ConfiguredFeature<TreeFeatureConfig,?> treeFeatureConfigConfiguredFeature = (ConfiguredFeature<TreeFeatureConfig,?>)configuredFeature;
+
+        FoliagePlacer foliagePlacer = treeFeatureConfigConfiguredFeature.getConfig().foliagePlacer;
+        TrunkPlacer trunkPlacer = treeFeatureConfigConfiguredFeature.getConfig().trunkPlacer;
+
+        if (trunkPlacer instanceof GiantTrunkPlacer) {
+          configuredBigFeatureList.add(new Pair<>(foliagePlacer,trunkPlacer));
+        } else {
+          configuredSmallFeatureList.add(new Pair<>(foliagePlacer,trunkPlacer));
+        }
+      }
+    }
+
     for (OreType material : OreType.values()) {
       PillarBlock logBlock = log(MaterialColor.CLEAR, MaterialColor.CLEAR);
       LeavesBlock leavesBlock = new LeavesBlock(leaves);
       registerBlock( loc(material + "_log"), logBlock);
       registerBlock( loc(material + "_leaves"), leavesBlock);
-      TreeFeatureConfig treeFeatureConfig = new TreeFeatureConfig.Builder(
-              new SimpleBlockStateProvider(logBlock.getDefaultState()),
-              new SimpleBlockStateProvider(leavesBlock.getDefaultState()),
-              new BlobFoliagePlacer(2, 0, 0, 0, 3),
-              new StraightTrunkPlacer(4, 2, 0), new TwoLayersFeatureSize(1, 0, 1)).ignoreVines().build();
+      List<ConfiguredFeature<TreeFeatureConfig,?>> configuredFeatureList1 = new ArrayList<>();
+      List<ConfiguredFeature<TreeFeatureConfig,?>> configuredFeatureList2 = new ArrayList<>();
 
-      ResourceSaplingBlock resourceSaplingBlock = new ResourceSaplingBlock(new ResourceTree(treeFeatureConfig), sapling);
+
+      for (Pair<FoliagePlacer,TrunkPlacer> placer : configuredSmallFeatureList) {
+        ConfiguredFeature<TreeFeatureConfig,?> configuredFeature =
+                Feature.TREE.configure((new TreeFeatureConfig.Builder(
+                        new SimpleBlockStateProvider(logBlock.getDefaultState()),
+                        new SimpleBlockStateProvider(leavesBlock.getDefaultState()),
+                        placer.getLeft(),
+                        placer.getRight(),
+                        new TwoLayersFeatureSize(2, 0, 2))).ignoreVines().build());
+
+        configuredFeatureList1.add(configuredFeature);
+      }
+
+      for (Pair<FoliagePlacer,TrunkPlacer> placer : configuredBigFeatureList) {
+        ConfiguredFeature<TreeFeatureConfig,?> configuredFeature =
+                Feature.TREE.configure((new TreeFeatureConfig.Builder(
+                        new SimpleBlockStateProvider(logBlock.getDefaultState()),
+                        new SimpleBlockStateProvider(leavesBlock.getDefaultState()),
+                        placer.getLeft(),
+                        placer.getRight(),
+                        new TwoLayersFeatureSize(2, 0, 2))).ignoreVines().build());
+        configuredFeatureList2.add(configuredFeature);
+      }
+
+
+
+      ResourceSaplingBlock resourceSaplingBlock = new ResourceSaplingBlock(new ResourceTree(configuredFeatureList1,configuredFeatureList2), sapling);
       registerBlock( loc(material + "_sapling"),
               resourceSaplingBlock);
       //FlowerPotBlock flowerPotBlock = new FlowerPotBlock(() -> (FlowerPotBlock)Blocks.FLOWER_POT,() -> resourceSaplingBlock,Block.Settings.of(Material.DECORATION).strength(0).noOcclusion());
@@ -113,6 +160,7 @@ public class Ferroustry implements ModInitializer, ClientModInitializer {
               BlockRenderLayerMap.INSTANCE.putBlock(block, renderType);
             });
   }
+
   private static PillarBlock log(MaterialColor p_235430_0_, MaterialColor p_235430_1_) {
     return new PillarBlock(AbstractBlock.Settings.of(Material.WOOD, (p_lambda$func_235430_a_$36_2_) ->
             p_lambda$func_235430_a_$36_2_.get(PillarBlock.AXIS) == Direction.Axis.Y ? p_235430_0_ : p_235430_1_)

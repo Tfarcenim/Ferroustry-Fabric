@@ -7,7 +7,7 @@
   ],
   "key": {
     "#": {
-      "tag": "forge:ores/diamond"
+      "tag": "forge:diamond_ores"
     },
     "s": {
       "tag": "minecraft:saplings"
