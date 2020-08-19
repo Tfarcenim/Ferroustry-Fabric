@@ -7,7 +7,7 @@
   ],
   "key": {
     "#": {
-      "tag": "c:copper_ores"
+      "tag": "fabric:copper_ores"
     },
     "s": {
       "tag": "minecraft:saplings"

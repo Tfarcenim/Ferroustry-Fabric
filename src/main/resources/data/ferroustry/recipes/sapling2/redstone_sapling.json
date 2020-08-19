@@ -7,7 +7,7 @@
   ],
   "key": {
     "#": {
-      "tag": "c:redstone_blocks"
+      "tag": "fabric:redstone_blocks"
     },
     "s": {
       "tag": "minecraft:saplings"

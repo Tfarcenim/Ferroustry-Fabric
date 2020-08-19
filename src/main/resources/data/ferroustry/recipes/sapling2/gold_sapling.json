@@ -7,7 +7,7 @@
   ],
   "key": {
     "#": {
-      "tag": "c:gold_blocks"
+      "tag": "fabric:gold_blocks"
     },
     "s": {
       "tag": "minecraft:saplings"
