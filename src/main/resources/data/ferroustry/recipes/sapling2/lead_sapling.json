@@ -7,7 +7,7 @@
   ],
   "key": {
     "#": {
-      "tag": "fabric:storage_blocks/lead"
+      "tag": "c:lead_blocks"
     },
     "s": {
       "tag": "minecraft:saplings"
