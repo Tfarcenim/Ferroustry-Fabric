@@ -7,7 +7,7 @@
   ],
   "key": {
     "#": {
-      "tag": "fabric:coal_ores"
+      "tag": "c:coal_ores"
     },
     "s": {
       "tag": "minecraft:saplings"

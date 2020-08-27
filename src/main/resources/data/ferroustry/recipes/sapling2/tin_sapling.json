@@ -7,7 +7,7 @@
   ],
   "key": {
     "#": {
-      "tag": "fabric:storage_blocks/tin"
+      "tag": "c:storage_blocks/tin"
     },
     "s": {
       "tag": "minecraft:saplings"
